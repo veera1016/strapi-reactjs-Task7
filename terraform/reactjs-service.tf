@@ -7,8 +7,8 @@ resource "aws_ecs_service" "reactjs" {
   platform_version = "1.4.0"
 
   network_configuration {
-    subnets          = ["<YOUR_SUBNET_ID>"]  # Replace with your subnet IDs
-    security_groups  = ["<YOUR_SECURITY_GROUP_ID>"]  # Replace with your security group ID
+    subnets          = ["subnet-00ecabcdee68011aa"]  # Replace with your subnet IDs
+    security_groups  = ["sg-09a727a76e975af3a"]  # Replace with your security group ID
     assign_public_ip = true
   }
 
