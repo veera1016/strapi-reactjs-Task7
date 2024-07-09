@@ -1,3 +1,3 @@
 resource "aws_ecs_cluster" "strapi" {
-  name = "strapi-cluster"
+  name = "Ashok-strapi-cluster"
 }
