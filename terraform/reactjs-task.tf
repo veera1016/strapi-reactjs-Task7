@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "reactjs" {
   container_definitions = jsonencode([
     {
       name      = "reactjs"
-      image     = "<YOUR_REACTJS_IMAGE>"  # Replace with your ReactJS image URL
+      image     = "veera1016/strapidocker:latest"  # Replace with your ReactJS image URL
       essential = true
       portMappings = [
         {
