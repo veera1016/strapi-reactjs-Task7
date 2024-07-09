@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "strapi" {
   container_definitions = jsonencode([
     {
       name      = "strapi"
-      image     = "<YOUR_STRAPI_IMAGE>"  # Replace with your Strapi image URL
+      image     = "veera1016/strapidocker:latest"  # Replace with your Strapi image URL
       essential = true
       portMappings = [
         {
