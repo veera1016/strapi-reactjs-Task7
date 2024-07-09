@@ -1,6 +1,6 @@
 resource "aws_route53_record" "strapi" {
-  zone_id = "<YOUR_ROUTE53_ZONE_ID>"  # Replace with your Route 53 hosted zone ID
-  name    = "yourname-api.contentecho.in"
+  zone_id = "Z06607023RJWXGXD2ZL6M"  # Replace with your Route 53 hosted zone ID
+  name    = "togaruashok1996-api.contentecho.in"
   type    = "A"
   alias {
     name                   = aws_lb.strapi.dns_name
