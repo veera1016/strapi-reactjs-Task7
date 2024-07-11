@@ -85,9 +85,8 @@ resource "aws_ecs_service" "strapi" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = aws_subnet.public[*].id
-    security_groups  = [aws_security_group.allow_all.id]
-    assign_public_ip = true
+    subnets         = aws_subnet.public[*].id
+    security_groups = [aws_security_group.allow_all.id]
   }
 }
 
@@ -98,9 +97,8 @@ resource "aws_ecs_service" "react" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = aws_subnet.public[*].id
-    security_groups  = [aws_security_group.allow_all.id]
-    assign_public_ip = true
+    subnets         = aws_subnet.public[*].id
+    security_groups = [aws_security_group.allow_all.id]
   }
 }
 
@@ -129,7 +127,7 @@ resource "aws_route53_record" "react" {
 # Example null_resource to run an external script (optional)
 resource "null_resource" "update_ips" {
   provisioner "local-exec" {
-    command = "python update_route53_records.py"  # Replace with your script
+    command = "python update_route53_records.py"  # Ensure this path is correct
   }
 
   triggers = {
