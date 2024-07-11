@@ -2,12 +2,11 @@ provider "aws" {
   region = "ca-central-1"
 }
 
-# VPC
+# VPC and Subnets
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 }
 
-# Public Subnets
 resource "aws_subnet" "public" {
   count                   = 2
   vpc_id                  = aws_vpc.main.id
@@ -16,10 +15,8 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 }
 
-# Availability Zones Data Source
 data "aws_availability_zones" "available" {}
 
-# Security Group
 resource "aws_security_group" "allow_all" {
   vpc_id = aws_vpc.main.id
 
@@ -43,7 +40,7 @@ resource "aws_ecs_cluster" "main" {
   name = "my-cluster"
 }
 
-# Strapi Task Definition
+# ECS Task Definitions
 resource "aws_ecs_task_definition" "strapi" {
   family                   = "strapi"
   network_mode             = "awsvpc"
@@ -62,21 +59,6 @@ resource "aws_ecs_task_definition" "strapi" {
   }])
 }
 
-# Strapi Service
-resource "aws_ecs_service" "strapi" {
-  name            = "strapi-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.strapi.arn
-  desired_count   = 1
-
-  network_configuration {
-    subnets          = aws_subnet.public[*].id
-    security_groups  = [aws_security_group.allow_all.id]
-    assign_public_ip = true
-  }
-}
-
-# React Task Definition
 resource "aws_ecs_task_definition" "react" {
   family                   = "react"
   network_mode             = "awsvpc"
@@ -95,7 +77,20 @@ resource "aws_ecs_task_definition" "react" {
   }])
 }
 
-# React Service
+# ECS Services
+resource "aws_ecs_service" "strapi" {
+  name            = "strapi-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.strapi.arn
+  desired_count   = 1
+
+  network_configuration {
+    subnets          = aws_subnet.public[*].id
+    security_groups  = [aws_security_group.allow_all.id]
+    assign_public_ip = true
+  }
+}
+
 resource "aws_ecs_service" "react" {
   name            = "react-service"
   cluster         = aws_ecs_cluster.main.id
@@ -114,22 +109,30 @@ resource "aws_route53_zone" "main" {
   name = "contentecho.in"
 }
 
-# Route 53 Record for Strapi
+# Route 53 DNS Records (Placeholders for IPs)
 resource "aws_route53_record" "strapi" {
   zone_id = aws_route53_zone.main.id
   name    = "togaruashok1996-api.contentecho.in"
   type    = "A"
   ttl     = 300
-  # You will need to manually update these records or use a different method to get the correct public IP.
-  records = ["<PUBLIC_IP_ADDRESS>"]
+  records = ["<DYNAMIC_PUBLIC_IP>"]  # Replace with actual IP or use a script to update it
 }
 
-# Route 53 Record for React
 resource "aws_route53_record" "react" {
   zone_id = aws_route53_zone.main.id
   name    = "togaruashok1996.contentecho.in"
   type    = "A"
   ttl     = 300
-  # You will need to manually update these records or use a different method to get the correct public IP.
-  records = ["<PUBLIC_IP_ADDRESS>"]
+  records = ["<DYNAMIC_PUBLIC_IP>"]  # Replace with actual IP or use a script to update it
+}
+
+# Example null_resource to run an external script (optional)
+resource "null_resource" "update_ips" {
+  provisioner "local-exec" {
+    command = "python update_route53_records.py"  # Replace with your script
+  }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 }
