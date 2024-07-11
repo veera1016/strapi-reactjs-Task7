@@ -2,10 +2,12 @@ provider "aws" {
   region = "ca-central-1"
 }
 
+# VPC
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 }
 
+# Public Subnets
 resource "aws_subnet" "public" {
   count                   = 2
   vpc_id                  = aws_vpc.main.id
@@ -17,6 +19,7 @@ resource "aws_subnet" "public" {
 # Availability Zones Data Source
 data "aws_availability_zones" "available" {}
 
+# Security Group
 resource "aws_security_group" "allow_all" {
   vpc_id = aws_vpc.main.id
 
@@ -35,10 +38,12 @@ resource "aws_security_group" "allow_all" {
   }
 }
 
+# ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "my-cluster"
 }
 
+# Strapi Task Definition
 resource "aws_ecs_task_definition" "strapi" {
   family                   = "strapi"
   network_mode             = "awsvpc"
@@ -57,6 +62,7 @@ resource "aws_ecs_task_definition" "strapi" {
   }])
 }
 
+# Strapi Service
 resource "aws_ecs_service" "strapi" {
   name            = "strapi-service"
   cluster         = aws_ecs_cluster.main.id
@@ -70,6 +76,7 @@ resource "aws_ecs_service" "strapi" {
   }
 }
 
+# React Task Definition
 resource "aws_ecs_task_definition" "react" {
   family                   = "react"
   network_mode             = "awsvpc"
@@ -88,6 +95,7 @@ resource "aws_ecs_task_definition" "react" {
   }])
 }
 
+# React Service
 resource "aws_ecs_service" "react" {
   name            = "react-service"
   cluster         = aws_ecs_cluster.main.id
@@ -101,22 +109,27 @@ resource "aws_ecs_service" "react" {
   }
 }
 
+# Route 53 Hosted Zone
 resource "aws_route53_zone" "main" {
   name = "contentecho.in"
 }
 
+# Route 53 Record for Strapi
 resource "aws_route53_record" "strapi" {
-  zone_id = Z06607023RJWXGXD2ZL6M
+  zone_id = aws_route53_zone.main.id
   name    = "togaruashok1996-api.contentecho.in"
   type    = "A"
   ttl     = 300
-  records = [aws_ecs_service.strapi.network_configuration[0].assign_public_ip]
+  # You will need to manually update these records or use a different method to get the correct public IP.
+  records = ["<PUBLIC_IP_ADDRESS>"]
 }
 
+# Route 53 Record for React
 resource "aws_route53_record" "react" {
-  zone_id = Z06607023RJWXGXD2ZL6M
+  zone_id = aws_route53_zone.main.id
   name    = "togaruashok1996.contentecho.in"
   type    = "A"
   ttl     = 300
-  records = [aws_ecs_service.react.network_configuration[0].assign_public_ip]
+  # You will need to manually update these records or use a different method to get the correct public IP.
+  records = ["<PUBLIC_IP_ADDRESS>"]
 }
